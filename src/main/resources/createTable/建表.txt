@@ -47,3 +47,14 @@ CREATE TABLE `oauth_client_details` (
   `autoapprove` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`client_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8
+
+
+CREATE TABLE `kafka_lag_his` (
+  `group_id` varchar(20)  COMMENT '消费组',
+  `topic` varchar(20)  COMMENT '主题',
+  `partiotion` varchar(20)  COMMENT '分区',
+  `current-offset` varchar(100)  COMMENT '当前偏移量',
+  `log-end-offset` varchar(100)  COMMENT 'end-offset',
+  `lag` varchar(100)  COMMENT 'end-offset',
+  `operation_time` date  COMMENT 'operation_time',
+) ;
