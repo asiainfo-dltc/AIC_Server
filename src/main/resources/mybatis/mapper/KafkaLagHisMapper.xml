@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.asiainfo.dao.KafkaLagHisDao">
+    <resultMap id="kafkaLagHisMap" type="com.asiainfo.model.KafkaLagHisEnity">
+        <result column="group_id" property="groupId" />
+        <result column="topic" property="topic" />
+        <result column="partition" property="partition" />
+        <result column="current_offset" property="currentOffset" />
+        <result column="log_end_offset" property="logEndOffset" />
+        <result column="lag" property="lag" />
+        <result column="operation_time" property="operationTime" />
+    </resultMap>
+
+
+    <insert id="insertKafkaLagHis">
+        insert into kafka_lag_his
+        values
+        (#{kafkaLagHisEnity.groupId},#{kafkaLagHisEnity.topic},#{kafkaLagHisEnity.partition},#{kafkaLagHisEnity.currentOffset},#{kafkaLagHisEnity.logEndOffset},#{kafkaLagHisEnity.lag},#{kafkaLagHisEnity.operationTime})
+    </insert>
+
+</mapper>
