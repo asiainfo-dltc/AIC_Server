@@ -9,6 +9,11 @@ spring:
     url: jdbc:mysql://10.124.159.211:3306/test_rep?characterEncoding=utf-8
     username: test_rep
     password: test_rep123
+  redis:
+    database: 1
+    host: 10.124.193.36
+    port: 6379
+    password: banana
 #报表生产域联调环境
 #spring:
   #datasource:
@@ -30,11 +35,8 @@ spring:
     #host: 10.191.44.118
     #port: 6379
     #password: banana
-redis:
-  database: 1
-  host: 10.124.193.36
-  port: 6379
-  password: banana
+
+
 mybatis:
   mapper-locations: classpath:mybatis/mapper/*.xml
   type-aliases-package: com.asiainfo.model
@@ -44,3 +46,4 @@ logging:
     org.springframework.web: DEBUG
     org.springframework.security: DEBUG
     com.asiainfo: DEBUG
+  file: ./logs/aic.log
