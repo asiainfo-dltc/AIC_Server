@@ -56,5 +56,5 @@ CREATE TABLE `kafka_lag_his` (
   `current-offset` varchar(100)  COMMENT '当前偏移量',
   `log-end-offset` varchar(100)  COMMENT 'end-offset',
   `lag` varchar(100)  COMMENT 'end-offset',
-  `operation_time` date  COMMENT 'operation_time',
+  `operation_time` date  COMMENT 'operation_time'
 ) ;
