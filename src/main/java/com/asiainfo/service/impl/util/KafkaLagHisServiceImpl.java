@@ -6,6 +6,8 @@ import com.asiainfo.service.util.KafkaLagHisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @author: create by hexin
  * @department: dltc
@@ -20,5 +22,10 @@ public class KafkaLagHisServiceImpl implements KafkaLagHisService{
     @Override
     public void insertLagHis(KafkaLagHisEnity kafkaLagHisEnity) {
         kafkaLagHisDao.insertKafkaLagHis(kafkaLagHisEnity);
+    }
+
+    @Override
+    public List<KafkaLagHisEnity> getLagHis(int pageSize, int start) {
+        return kafkaLagHisDao.getKafkaLagHis(pageSize,start);
     }
 }

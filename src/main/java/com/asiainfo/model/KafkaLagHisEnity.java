@@ -48,7 +48,7 @@ public class KafkaLagHisEnity {
   }
 
 
-  public String getLog_End_Offset() {
+  public String getLogEndOffset() {
     return logEndOffset;
   }
 

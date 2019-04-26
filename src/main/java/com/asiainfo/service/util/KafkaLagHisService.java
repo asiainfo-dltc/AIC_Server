@@ -3,6 +3,8 @@ package com.asiainfo.service.util;
 
 import com.asiainfo.model.KafkaLagHisEnity;
 
+import java.util.List;
+
 /**
  * @author: create by hexin
  * @department: dltc
@@ -12,4 +14,5 @@ import com.asiainfo.model.KafkaLagHisEnity;
  */
 public interface KafkaLagHisService {
     void insertLagHis(KafkaLagHisEnity kafkaLagHisEnity);
+    public List<KafkaLagHisEnity> getLagHis(int pageSize, int start);
 }

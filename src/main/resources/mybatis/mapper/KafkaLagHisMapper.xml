@@ -17,5 +17,11 @@
         values
         (#{kafkaLagHisEnity.groupId},#{kafkaLagHisEnity.topic},#{kafkaLagHisEnity.partition},#{kafkaLagHisEnity.currentOffset},#{kafkaLagHisEnity.logEndOffset},#{kafkaLagHisEnity.lag},#{kafkaLagHisEnity.operationTime})
     </insert>
+    <select id="getKafkaLagHis" resultMap="kafkaLagHisMap">
+        <![CDATA[select * from kafka_lag_his]]>
+        <if test="pageSize != null and start != null ">
+            limit #{start},#{pageSize}
+        </if>
+    </select>
 
 </mapper>
