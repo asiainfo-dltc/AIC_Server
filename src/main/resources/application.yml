@@ -47,3 +47,5 @@ logging:
     org.springframework.security: DEBUG
     com.asiainfo: DEBUG
   file: ./logs/aic.log
+ZK_ADDRESS: dn31.hadoop.unicom:2181,dn32.hadoop.unicom:2181,dn33.hadoop.unicom:2181
+ZK_ZNODE_PARENT: /hbase-unsecure
