@@ -59,13 +59,13 @@ public class SaticScheduleTask {
    // @Scheduled(cron = "*/2 * * * * ?")
     //或直接指定时间间隔，例如：5秒
     //@Scheduled(fixedRate=5000)
-/*   @Scheduled(cron = "0 0 6,18 * * ?")
+   @Scheduled(cron = "0 0 6,18 * * ?")
     private void configureTasks() {
         System.err.println("执行静态定时任务时间: " + LocalDateTime.now());
 
         readShellLine.readShellLine();
-    }*/
-    @Scheduled(fixedRate=1000*60)
+    }
+    /*@Scheduled(fixedRate=1000*60)
     public void doTask(){
         try {
             long handleDate = System.currentTimeMillis()-1000*60*60;
@@ -139,5 +139,5 @@ public class SaticScheduleTask {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
+    }*/
 }
