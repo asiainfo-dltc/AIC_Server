@@ -31,7 +31,6 @@ import java.util.StringTokenizer;
 public class ReadShellLine {
     @Autowired
     private KafkaLagHisService kafkaLagHisService;
-
     public  void readShellLine() {
         String[] groups=new String[]{
                 "T0000_CB.DOMAIN1.ROUTER.ACCESS_0630_221",
@@ -58,9 +57,9 @@ public class ReadShellLine {
 
     }
 
-    public void excuteCommand(String groupid){
+    public List<KafkaLagHisEnity> excuteCommand(String groupid){
         Process process = null;
-        List<String> processList = new ArrayList<String>();
+        List<KafkaLagHisEnity> processList = new ArrayList<KafkaLagHisEnity>();
         try {
             //String groupid = "T0000_CB.DOMAIN1.ROUTER.ACCESS_0630_221";
             String commandStr = "export KAFKA_OPTS=\" -Djava.security.auth.login.config=/home/dacp/monitor/zrr-kafka/client-ssl/kafka_cilent_jaas.conf\"\n" + "/home/dacp/monitor/zrr-kafka/kafka_2.12-1.1.0/bin/kafka-consumer-groups.sh --new-consumer --bootstrap-server 10.191.17.109:9062,10.191.17.110:9062 --command-config /home/dacp/monitor/zrr-kafka/client-ssl/client.properties --describe --group " + groupid + " | sort -n -k 2";
@@ -74,7 +73,8 @@ public class ReadShellLine {
             int i =1;
             while ((line = input.readLine()) != null) {
                 if(i>2){//判断是第二行，进行文件行内容输出。
-                    formatter(line,groupid);
+                   formatter(line,groupid);
+
                 }
                 i++;
                 //processList.add(line);
@@ -83,6 +83,7 @@ public class ReadShellLine {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return processList;
     }
 
     public void formatter(String line,String group){
@@ -107,5 +108,62 @@ public class ReadShellLine {
         String str = sdf.format(d);
         enity.setOperationTime(str);
         kafkaLagHisService.insertLagHis(enity);
+    }
+
+    public List<KafkaLagHisEnity> excuteCommandQuery(String groupid){
+        Process process = null;
+        List<KafkaLagHisEnity> processList = new ArrayList<KafkaLagHisEnity>();
+        try {
+            //String groupid = "T0000_CB.DOMAIN1.ROUTER.ACCESS_0630_221";
+
+
+            String commandStr = "export KAFKA_OPTS=\" -Djava.security.auth.login.config=/home/dacp/monitor/zrr-kafka/client-ssl/kafka_cilent_jaas.conf\"\n" + "/home/dacp/monitor/zrr-kafka/kafka_2.12-1.1.0/bin/kafka-consumer-groups.sh --new-consumer --bootstrap-server 10.191.17.109:9062,10.191.17.110:9062 --command-config /home/dacp/monitor/zrr-kafka/client-ssl/client.properties --describe --group " + groupid + " | sort -n -k 2";
+            System.out.println("消费组：" + groupid);
+            String[] cmd = new String[]{"/bin/sh", "-c", commandStr};
+            process = Runtime.getRuntime().exec(cmd);
+
+            BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line = "";
+
+            int i =1;
+            while ((line = input.readLine()) != null) {
+                if(i>2){//判断是第二行，进行文件行内容输出。
+                    System.out.println("line"+line);
+                    KafkaLagHisEnity enity=formatterQuery(line,groupid);
+                    System.out.println("getCurrentOffset"+enity.getCurrentOffset());
+                    processList.add(enity);
+                }
+                i++;
+
+            }
+            input.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return processList;
+    }
+
+    public KafkaLagHisEnity formatterQuery(String line,String group){
+
+
+        StringTokenizer pas = new StringTokenizer(line, " ");
+        line = ""; //这里清空了str，但StringTokenizer对象中已经保留了原来字符串的内容。
+        while (pas.hasMoreTokens()) {
+            String s = pas.nextToken();
+            line = line + s + " ";
+        }
+        String[] arr=line.trim().split(" ");
+        KafkaLagHisEnity enity=new KafkaLagHisEnity();
+        enity.setGroupId(group);
+        enity.setTopic(arr[0]);
+        enity.setPartition(arr[1]);
+        enity.setCurrentOffset(arr[2]);
+        enity.setLogEndOffset(arr[3]);
+        enity.setLag(arr[4]);
+        SimpleDateFormat sdf =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss" );
+        Date d= new Date();
+        String str = sdf.format(d);
+        enity.setOperationTime(str);
+        return enity;
     }
 }

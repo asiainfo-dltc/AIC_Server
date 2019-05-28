@@ -44,8 +44,12 @@ public class SaticScheduleTask {
 
     @Resource(name = "kafkaLagHisServiceImpl")
     private KafkaLagHisService kafkaLagHisService;
+
+
     @Resource(name = "readShellLine")
     private ReadShellLine readShellLine;
+
+
     @Autowired
     protected JdbcTemplate jdbcTemplate;
     @Autowired
@@ -56,13 +60,13 @@ public class SaticScheduleTask {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     //3.添加定时任务
 
-   // @Scheduled(cron = "*/2 * * * * ?")
+   // @Scheduled(cron = "*/30 * * * * ?")
     //或直接指定时间间隔，例如：5秒
     //@Scheduled(fixedRate=5000)
    @Scheduled(cron = "0 0 6,18 * * ?")
     private void configureTasks() {
         System.err.println("执行静态定时任务时间: " + LocalDateTime.now());
-
+       // ReadShellLine readShellLine=new ReadShellLine();
         readShellLine.readShellLine();
     }
     /*@Scheduled(fixedRate=1000*60)

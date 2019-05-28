@@ -1,9 +1,13 @@
 package com.asiainfo.service.util;
 
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.model.KafkaLagHisEnity;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @author: create by hexin
@@ -15,4 +19,5 @@ import java.util.List;
 public interface KafkaLagHisService {
     void insertLagHis(KafkaLagHisEnity kafkaLagHisEnity);
     public List<KafkaLagHisEnity> getLagHis(int pageSize, int start);
+    public JSONArray getLag(JSONArray groupIds) throws ExecutionException, InterruptedException;
 }
