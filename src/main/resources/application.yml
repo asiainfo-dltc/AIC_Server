@@ -3,17 +3,17 @@ server:
   servlet:
     context-path: /wh
 #测试域
-spring:
-  datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://10.124.159.211:3306/test_rep?characterEncoding=utf-8
-    username: test_rep
-    password: test_rep123
-  redis:
-    database: 1
-    host: 10.124.193.36
-    port: 6379
-    password: banana
+#spring:
+  #datasource:
+    #driver-class-name: com.mysql.jdbc.Driver
+    #url: jdbc:mysql://10.124.159.211:3306/test_rep?characterEncoding=utf-8
+    #username: test_rep
+    #password: test_rep123
+  #redis:
+   #database: 1
+    #host: 10.124.193.36
+    #port: 6379
+    #password: banana
 #报表生产域联调环境
 #spring:
   #datasource:
@@ -22,12 +22,20 @@ spring:
     #username: prod_sjgj_drepor
     #password: prod_sjgj_drepor556
 #报表生产域生产环境
-#spring:
-  #datasource:
-   #driver-class-name: com.mysql.jdbc.Driver
-    #url: jdbc:mysql://10.245.32.43:3306/prod_sjgj_ddata?characterEncoding=utf-8
-  #username: prod_sjgj_ddata
-  #password: prod_sjgj_ddata334
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://10.245.32.43:3306/prod_sjgj_ddata?characterEncoding=utf-8
+    username: prod_sjgj_ddata
+    password: prod_SJGJ4_ddata
+  redis:
+    database: 1
+    host: 10.245.32.69
+    port: 6379
+    maxActive: 300
+    maxIdle: 100
+    maxWaitMillis: 10000
+    password: r-fk4979cce008efe4:PROsjgj345
 
 #生产redis
 #redis:
@@ -35,8 +43,6 @@ spring:
     #host: 10.191.44.118
     #port: 6379
     #password: banana
-
-
 mybatis:
   mapper-locations: classpath:mybatis/mapper/*.xml
   type-aliases-package: com.asiainfo.model
