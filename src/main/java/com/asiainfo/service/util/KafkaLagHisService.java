@@ -17,7 +17,9 @@ import java.util.concurrent.ExecutionException;
  * @date:2019/4/1
  */
 public interface KafkaLagHisService {
-    void insertLagHis(KafkaLagHisEnity kafkaLagHisEnity);
+    public void insertLagHis(KafkaLagHisEnity kafkaLagHisEnity);
     public List<KafkaLagHisEnity> getLagHis(int pageSize, int start);
     public JSONArray getLag(JSONArray groupIds) throws ExecutionException, InterruptedException;
+    public  void seekOffset(KafkaLagHisEnity kafkaLagHisEnity);
+
 }

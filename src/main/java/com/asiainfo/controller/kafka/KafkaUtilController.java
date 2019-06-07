@@ -7,9 +7,12 @@ import com.asiainfo.model.sys.PageResult;
 import com.asiainfo.service.util.KafkaLagHisService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.ResourceUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -47,20 +50,26 @@ public class KafkaUtilController {
     }
     @GetMapping("/getLags")
     public JSONArray getLags(String groupIds) throws ExecutionException, InterruptedException {
-            JSONArray arr=JSONObject.parseArray(groupIds);
-
-
-        List<KafkaLagHisEnity> lags=new ArrayList<>();
-        KafkaLagHisEnity kafkaLagHisEnity =new KafkaLagHisEnity();
-     /*   kafkaLagHisEnity.setOperationTime("20190417");
-        kafkaLagHisEnity.setLag("10000");
-        kafkaLagHisEnity.setTopic("topic");
-        kafkaLagHisEnity.setGroupId("group");
-        lags.add(kafkaLagHisEnity);*/
+        JSONArray arr=JSONObject.parseArray(groupIds);
+        //List<KafkaLagHisEnity> lags=new ArrayList<>();
+       // KafkaLagHisEnity kafkaLagHisEnity =new KafkaLagHisEnity();
         JSONArray result= kafkaLagHisService.getLag(arr);
-      //  pageResult.setData();
         return result;
     }
+    @PostMapping("/seekOffset")
+    public void seekOffset(@RequestBody KafkaLagHisEnity kafkaLagHisEnity) throws ExecutionException, InterruptedException {
+
+        kafkaLagHisService.seekOffset(kafkaLagHisEnity);
+
+      /*  JSONArray arr=JSONObject.parseArray(groupIds);
+        List<KafkaLagHisEnity> lags=new ArrayList<>();
+        KafkaLagHisEnity kafkaLagHisEnity =new KafkaLagHisEnity();
+        JSONArray result= kafkaLagHisService.getLag(arr);
+        return result;*/
+
+    }
+
+
 
 
     public void main(){

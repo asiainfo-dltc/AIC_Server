@@ -4,14 +4,19 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.dao.KafkaLagHisDao;
 import com.asiainfo.model.KafkaLagHisEnity;
+/*import com.asiainfo.service.conf.RedisService;*/
+import com.asiainfo.service.conf.RedisService;
 import com.asiainfo.service.util.KafkaLagHisService;
 import com.asiainfo.utils.TaskCallable;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.consumer.ConsumerRecords;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ResourceUtils;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
@@ -49,59 +54,123 @@ public class KafkaLagHisServiceImpl implements KafkaLagHisService{
         ExecutorService exec = Executors.newCachedThreadPool();//工头
         ArrayList<Future<List<KafkaLagHisEnity>>> loadResults = new ArrayList<Future<List<KafkaLagHisEnity>>>();//
 
-        for(int i=0;i<groupIds.size();i++){
-
+       for(int i=0;i<groupIds.size();i++){
             String group = groupIds.get(i).toString();  // 遍历 jsonarray 数组，把每一个对象转成 json 对象
-
             loadResults.add(exec.submit(new TaskCallable(group)));
-
-
-
-
-            //results.add();//submit返回一个Future，代表了即将要返回的结果
-           // Future<List<KafkaLagHisEnity>> list= exec.submit(new TaskCallable(group));
-        //    List<KafkaLagHisEnity> detail=excuteCommand(group);
-
-            /*    obj.put("groupId",group);
-                obj.put("topic",list.get().get(0).getTopic() );
-                obj.put("detail",list.get());
-                result.add(obj);*/
-
-            /*List<KafkaLagHisEnity> detail=new ArrayList<KafkaLagHisEnity>();
-            KafkaLagHisEnity entity =new KafkaLagHisEnity();
-            KafkaLagHisEnity entity1 =new KafkaLagHisEnity();
-            entity.setCurrentOffset("111");
-            entity.setPartition("0");
-            entity1.setCurrentOffset("2222");
-            entity1.setPartition("2");
-            detail.add(entity);
-            detail.add(entity1);
-            obj.put("groupId",group);
-            obj.put("topic",detail.get(0).getTopic());
-            obj.put("detail",detail);
-            result.add(obj);*/
         }
-      //  ArrayList<Future<List<KafkaLagHisEnity>>> loadResultsTemp = loadResults;
 
-        if(getLoadPercent(loadResults))
+       if(getLoadPercent(loadResults))
         {
-         //   System.out.println("aaaaa");
-
             Iterator<Future<List<KafkaLagHisEnity>>> it = loadResults.iterator();
             while (it.hasNext()) {
                 Future<List<KafkaLagHisEnity>> next = it.next();
                 JSONObject obj =new JSONObject();
-
                 obj.put("groupId",next.get().get(0).getGroupId());
                 obj.put("topic",next.get().get(0).getTopic() );
                 obj.put("detail",next.get());
                 result.add(obj);
             }
-
-
         }
+        /*模拟数据*/
+          /* List<KafkaLagHisEnity> detail=new ArrayList<KafkaLagHisEnity>();
+            JSONObject obj =new JSONObject();
+            KafkaLagHisEnity entity =new KafkaLagHisEnity();
+            KafkaLagHisEnity entity1 =new KafkaLagHisEnity();
+            entity.setCurrentOffset("111");
+            entity.setPartition("0");
+            entity.setTopic("topic001");
+            entity.setGroupId("0411");
+             entity1.setCurrentOffset("2222");
+            entity1.setPartition("2");
+            detail.add(entity);
+            detail.add(entity1);
+            obj.put("groupId","aaaaaa");
+            obj.put("topic",detail.get(0).getTopic());
+            obj.put("detail",detail);
+            result.add(obj);*/
 
         return  result;
+    }
+    /*
+    * 调整偏移量
+    *
+    * */
+    @Override
+    public void seekOffset(KafkaLagHisEnity kafkaLagHisEnity) {
+
+
+        File path = null;
+        String rootPath = "";
+        System.out.println(kafkaLagHisEnity.getCurrentOffset());
+        try {
+            path = new File(ResourceUtils.getURL("classpath:").getPath());
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        rootPath = path.getAbsolutePath();
+        //System.out.println("rootPath"+rootPath);
+
+        Long offset =Long.parseLong(kafkaLagHisEnity.getCurrentOffset());
+
+        String client_ssl_dir = rootPath+"\\client-ssl\\";
+        Properties props = new Properties();
+       // props.put("bootstrap.servers", "dn49.hadoop.unicom:6667,dn50.hadoop.unicom:6667,dn51.hadoop.unicom:6667,dn54.hadoop.unicom:6667,dn55.hadoop.unicom:6667,dn56.hadoop.unicom:6667");
+        props.put("bootstrap.servers", "ZRR-PRODUCT-109:9062,ZRR-PRODUCT-110:9062,ZRR-PRODUCT-111:9062,ZRR-PRODUCT-112:9062,ZRR-PRODUCT-113:9062,ZRR-PRODUCT-114:9062,ZRR-PRODUCT-115:9062,ZRR-PRODUCT-116:9062,ZRR-PRODUCT-117:9062");
+        //props.put("bootstrap.servers", "10.5.8.35:9092,10.5.8.36:9092,10.5.8.37:9092");
+        props.put("group.id", kafkaLagHisEnity.getGroupId());
+        props.put("enable.auto.commit", "true");
+        props.put("max.partition.fetch.bytes", 51200);
+        props.put("auto.commit.interval.ms", "1000");
+        props.put("session.timeout.ms", "30000");
+        //props.put("auto.offset.reset", "earliest");
+        props.put("auto.offset.reset", "latest");
+        props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        //props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        props.put("value.deserializer", "org.apache.kafka.common.serialization.ByteArrayDeserializer");
+        props.put("max.poll.records",1);
+        props.put("ssl.key.password", "zrr@kafkacenter");
+        props.put("ssl.keystore.password", "zrr@kafkacenter");
+        props.put("ssl.truststore.location", client_ssl_dir+"kafkacenter_client.truststore.jks");
+        props.put("ssl.keystore.location", client_ssl_dir+"kafkacenter_client.keystore.jks");
+        props.put("ssl.key.location", client_ssl_dir+"kafkacenter_client.key");
+        props.put("ssl.certificate.location", client_ssl_dir+"kafkacenter_client.pem");
+        props.put("ssl.ca.location", client_ssl_dir+"ca-cert");
+        props.put("sasl.mechanism", "PLAIN");
+        props.put("security.protocol", "SASL_SSL");
+        props.put("ssl.keystore.type", "JKS");
+        System.setProperty("java.security.auth.login.config", client_ssl_dir+"kafka_cilent_jaas.conf");
+
+        KafkaConsumer consumer = new KafkaConsumer(props);
+      //  TopicPartition partition0 = new TopicPartition(topic, partition);
+       // consumer.assign(Arrays.asList(partition0));
+
+        TopicPartition partition0 = new TopicPartition(kafkaLagHisEnity.getTopic(), Integer.parseInt(kafkaLagHisEnity.getPartition()));
+
+        consumer.assign(Arrays.asList(partition0));
+        consumer.seek(partition0,offset);
+
+       /* while (true) {
+            ConsumerRecords<String, String> records = consumer.poll(1000);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            try {
+                for (ConsumerRecord<String, String> record : records) {
+
+                    //System.out.printf("topic = %s,partition = %d, offset = %s, time = %s, value = %s\n",record.topic(),record.partition(),record.offset(),sdf.format(new Date(Long.valueOf(record.timestamp()))),record.value());
+                    System.out.printf("topic = %s,partition = %d, offset = %s, timestep = %s, time = %s, value = %s\n", record.topic(), record.partition(), record.offset(), record.timestamp(), sdf.format(new Date(Long.valueOf(record.timestamp()))), record.value());
+//                    if(Long.valueOf(record.timestamp())>1552579199000l)
+                    //  consumer.commitSync();
+                    System.exit(0);
+
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }*/
+        // 指定kafka topic的offset消费
+       // consumer.seek(partition0,Integer.parseInt(kafkaLagHisEnity.getCurrentOffset()));
+        consumer.commitSync();
+
     }
 
     public boolean  getLoadPercent(ArrayList<Future<List<KafkaLagHisEnity>>>  loadResults ) {
@@ -130,61 +199,6 @@ public class KafkaLagHisServiceImpl implements KafkaLagHisService{
         }
         return true;
     }
-    /*public List<KafkaLagHisEnity> excuteCommand(String groupid){
-        Process process = null;
-        List<KafkaLagHisEnity> processList = new ArrayList<KafkaLagHisEnity>();
-        try {
-            //String groupid = "T0000_CB.DOMAIN1.ROUTER.ACCESS_0630_221";
 
-
-            String commandStr = "export KAFKA_OPTS=\" -Djava.security.auth.login.config=/home/dacp/monitor/zrr-kafka/client-ssl/kafka_cilent_jaas.conf\"\n" + "/home/dacp/monitor/zrr-kafka/kafka_2.12-1.1.0/bin/kafka-consumer-groups.sh --new-consumer --bootstrap-server 10.191.17.109:9062,10.191.17.110:9062 --command-config /home/dacp/monitor/zrr-kafka/client-ssl/client.properties --describe --group " + groupid + " | sort -n -k 2";
-            System.out.println("消费组：" + groupid);
-            String[] cmd = new String[]{"/bin/sh", "-c", commandStr};
-            process = Runtime.getRuntime().exec(cmd);
-
-            BufferedReader input = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            String line = "";
-
-            int i =1;
-            while ((line = input.readLine()) != null) {
-                if(i>2){//判断是第二行，进行文件行内容输出。
-                    System.out.println("line"+line);
-                    KafkaLagHisEnity enity=formatter(line,groupid);
-                    System.out.println("getCurrentOffset"+enity.getCurrentOffset());
-                    processList.add(enity);
-                }
-                i++;
-
-            }
-            input.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return processList;
-    }
-
-    public KafkaLagHisEnity formatter(String line,String group){
-
-
-        StringTokenizer pas = new StringTokenizer(line, " ");
-        line = ""; //这里清空了str，但StringTokenizer对象中已经保留了原来字符串的内容。
-        while (pas.hasMoreTokens()) {
-            String s = pas.nextToken();
-            line = line + s + " ";
-        }
-        String[] arr=line.trim().split(" ");
-        KafkaLagHisEnity enity=new KafkaLagHisEnity();
-        enity.setGroupId(group);
-        enity.setTopic(arr[0]);
-        enity.setPartition(arr[1]);
-        enity.setCurrentOffset(arr[2]);
-        enity.setLogEndOffset(arr[3]);
-        enity.setLag(arr[4]);
-        SimpleDateFormat sdf =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss" );
-        Date d= new Date();
-        String str = sdf.format(d);
-        enity.setOperationTime(str);
-        return enity;
-    }*/
 
 }

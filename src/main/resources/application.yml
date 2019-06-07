@@ -22,6 +22,9 @@ server:
     #username: prod_sjgj_drepor
     #password: prod_sjgj_drepor556
 #报表生产域生产环境
+jasypt:
+  encryptor:
+    password: 64AAiWOHD
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
