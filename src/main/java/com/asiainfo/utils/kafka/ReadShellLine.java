@@ -48,7 +48,9 @@ public class ReadShellLine {
                 "T0000_CB.DOMAIN5.MAIN.ROUTER.ACCESS_0630_221",
                 "T0000_CB.DOMAIN6.MAIN.ROUTER.ACCESS_0630_221",
                 "T0000_CB.DOMAIN7.MAIN.ROUTER.ACCESS_0630_221",
-                "T0000_CB.DOMAIN8.MAIN.ROUTER.ACCESS_0630_221"
+                "T0000_CB.DOMAIN8.MAIN.ROUTER.ACCESS_0630_221",
+                "T0000_GUANGXI.ROUTER.ACCESS_0630_221",
+                "T0000_GUANGXI.MAIN.ROUTER.ACCESS_0630_221"
         };
         for(int i=0;i<groups.length;i++)
         {
@@ -62,7 +64,9 @@ public class ReadShellLine {
         List<KafkaLagHisEnity> processList = new ArrayList<KafkaLagHisEnity>();
         try {
             //String groupid = "T0000_CB.DOMAIN1.ROUTER.ACCESS_0630_221";
-            String commandStr = "export KAFKA_OPTS=\" -Djava.security.auth.login.config=/home/dacp/monitor/zrr-kafka/client-ssl/kafka_cilent_jaas.conf\"\n" + "/home/dacp/monitor/zrr-kafka/kafka_2.12-1.1.0/bin/kafka-consumer-groups.sh --new-consumer --bootstrap-server 10.191.17.109:9062,10.191.17.110:9062 --command-config /home/dacp/monitor/zrr-kafka/client-ssl/client.properties --describe --group " + groupid + " | sort -n -k 2";
+           // String commandStr = "export KAFKA_OPTS=\" -Djava.security.auth.login.config=/home/dacp/monitor/zrr-kafka/client-ssl/kafka_cilent_jaas.conf\"\n" + "/home/dacp/monitor/zrr-kafka/kafka_2.12-1.1.0/bin/kafka-consumer-groups.sh --new-consumer --bootstrap-server 10.191.17.109:9062,10.191.17.110:9062 --command-config /home/dacp/monitor/zrr-kafka/client-ssl/client.properties --describe --group " + groupid + " | sort -n -k 2";
+
+            String commandStr = "export KAFKA_OPTS=\" -Djava.security.auth.login.config=/home/admin/client-ssl/kafka_cilent_jaas.conf\"\n" + "/home/admin/kafka_2.12-1.1.0/bin/kafka-consumer-groups.sh --new-consumer --bootstrap-server 10.191.17.109:9062,10.191.17.110:9062 --command-config /home/admin/client-ssl/client.properties --describe --group " + groupid + " | sort -n -k 2";
             System.out.println("消费组：" + groupid);
             String[] cmd = new String[]{"/bin/sh", "-c", commandStr};
            process = Runtime.getRuntime().exec(cmd);
@@ -103,11 +107,13 @@ public class ReadShellLine {
         enity.setCurrentOffset(arr[2]);
         enity.setLogEndOffset(arr[3]);
         enity.setLag(arr[4]);
-        SimpleDateFormat sdf =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss" );
+        SimpleDateFormat sdf =new SimpleDateFormat("yyyy-MM-dd HH:00:00" );
         Date d= new Date();
         String str = sdf.format(d);
         enity.setOperationTime(str);
+       // System.out.println("insert start "+line);
         kafkaLagHisService.insertLagHis(enity);
+       // System.out.println("insert end ");
     }
 
     public List<KafkaLagHisEnity> excuteCommandQuery(String groupid){
@@ -160,7 +166,7 @@ public class ReadShellLine {
         enity.setCurrentOffset(arr[2]);
         enity.setLogEndOffset(arr[3]);
         enity.setLag(arr[4]);
-        SimpleDateFormat sdf =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss" );
+        SimpleDateFormat sdf =new SimpleDateFormat("yyyy-MM-dd HH:00:00" );
         Date d= new Date();
         String str = sdf.format(d);
         enity.setOperationTime(str);

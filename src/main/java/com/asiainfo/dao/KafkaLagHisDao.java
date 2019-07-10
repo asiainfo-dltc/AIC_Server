@@ -1,5 +1,6 @@
 package com.asiainfo.dao;
 
+import com.alibaba.fastjson.JSONArray;
 import com.asiainfo.model.KafkaLagHisEnity;
 import com.asiainfo.model.sys.MenuEntity;
 import org.apache.ibatis.annotations.Mapper;
@@ -17,5 +18,8 @@ import java.util.List;
 @Mapper
 public interface KafkaLagHisDao {
     public void insertKafkaLagHis(@Param("kafkaLagHisEnity") KafkaLagHisEnity kafkaLagHisEnity);
-    public List<KafkaLagHisEnity> getKafkaLagHis(@Param("pageSize") int pageSize, @Param("start") int start);
+    public List<KafkaLagHisEnity> getKafkaLagHis(@Param("start") String startDate, @Param("end") String endDate);
+    public List<String> getKafkaTopicsHis();
+
+    public JSONArray getLogEndOffset();
 }

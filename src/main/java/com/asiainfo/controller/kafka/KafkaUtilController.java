@@ -14,7 +14,9 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -33,9 +35,9 @@ public class KafkaUtilController {
 
 
     @GetMapping("/getLagsHis")
-    public PageResult menusList(int pageSize, int page, String menuId) {
+    public JSONObject getLagsHis(String start,String end) {
         PageResult pageResult = new PageResult();
-
+        JSONObject jsonObject=new JSONObject();
         List<KafkaLagHisEnity> lags=new ArrayList<>();
         KafkaLagHisEnity kafkaLagHisEnity =new KafkaLagHisEnity();
      /*   kafkaLagHisEnity.setOperationTime("20190417");
@@ -43,10 +45,30 @@ public class KafkaUtilController {
         kafkaLagHisEnity.setTopic("topic");
         kafkaLagHisEnity.setGroupId("group");
         lags.add(kafkaLagHisEnity);*/
-        pageResult.setData(kafkaLagHisService.getLagHis(10,0));
-        pageResult.setTotalCount(10);
-        log.debug("The method is ending");
-        return pageResult;
+        List<KafkaLagHisEnity> result= kafkaLagHisService.getLagHis(start,end);
+        List<String> topics= kafkaLagHisService.getTopicsHis();
+        List<String> logEndOffset= new ArrayList<>();
+        String[] xAxis={"2019-07-06","2019-07-07","2019-07-08"};
+        jsonObject.put("legend",topics);
+        jsonObject.put("xAxis",xAxis);
+        ArrayList<Map> series = new ArrayList<Map>();
+        for(int i=0;i<topics.size();i++){
+            HashMap map = new HashMap();
+            map.put("name",topics.get(i) );
+            map.put("type","line" );
+            map.put("stack","总量" );
+
+            for(int k=0;k<result.size();k++) {
+
+            if(topics.get(i).equals(result.get(k).getTopic())) {
+                logEndOffset.add(result.get(k).getLogEndOffset());
+                 }
+             }
+            map.put("data",logEndOffset);
+            series.add(map);
+        }
+        jsonObject.put("series",series);
+        return jsonObject;
     }
     @GetMapping("/getLags")
     public JSONArray getLags(String groupIds) throws ExecutionException, InterruptedException {
@@ -56,6 +78,15 @@ public class KafkaUtilController {
         JSONArray result= kafkaLagHisService.getLag(arr);
         return result;
     }
+
+ /*   @GetMapping("/getLogEndOffset")
+    public JSONArray getLogEndOffset() throws ExecutionException, InterruptedException {
+      //  JSONArray arr=JSONObject.parseArray(groupIds);
+        //List<KafkaLagHisEnity> lags=new ArrayList<>();
+        // KafkaLagHisEnity kafkaLagHisEnity =new KafkaLagHisEnity();
+        JSONArray result= kafkaLagHisService.getLogEndOffset();
+        return result;
+    }*/
     @PostMapping("/seekOffset")
     public void seekOffset(@RequestBody KafkaLagHisEnity kafkaLagHisEnity) throws ExecutionException, InterruptedException {
 
@@ -70,19 +101,4 @@ public class KafkaUtilController {
     }
 
 
-
-
-    public void main(){
-
-        JSONArray arr=new JSONArray();
-        arr.add(new String[]{"1"});
-        arr.add(new String[]{"2"});
-        try {
-            kafkaLagHisService.getLag(arr);
-        } catch (ExecutionException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
 }

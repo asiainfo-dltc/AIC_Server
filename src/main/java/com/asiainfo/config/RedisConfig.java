@@ -47,11 +47,11 @@ public class RedisConfig extends CachingConfigurerSupport {
         jedisPoolConfig.setMaxIdle(maxIdle);
         jedisPoolConfig.setMaxTotal(maxActive);
         jedisPoolConfig.setMaxWaitMillis(maxWaitMillis);
-        System.out.println("1231231");
+
         JedisPool jedisPool = new JedisPool(jedisPoolConfig, host, port, 0, password);
 
         log.debug("JedisPool注入成功！");
-       log.debug("redis地址：" + host + ":"+port+"pwd"+password );
+        log.debug("redis地址：" + host + ":"+port+"pwd"+password );
         return  jedisPool;
     }
 }

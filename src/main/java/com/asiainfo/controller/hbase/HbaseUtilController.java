@@ -23,11 +23,11 @@ public class HbaseUtilController {
 
 
     @GetMapping("/getRelationData")
-    public List<Map<String,String>> getRelationData(String rowKey) {
+    public List<Map<String,String>> getRelationData(String tableName,String rowKey) {
 
         System.out.println("rowKey"+rowKey);
         System.out.println("tables"+hbaseService.getAllTableNames());
-        List<Map<String,String>> result=hbaseService.getRowData("ORDER_RELATION_TABLE",rowKey);
+        List<Map<String,String>> result=hbaseService.getRowData(tableName,rowKey);
        // System.out.println("tables"+hbaseService.getRowData("ORDER_RELATION_TABLE",rowKey));
         return result;
     }

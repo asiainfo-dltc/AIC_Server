@@ -2,7 +2,7 @@ package com.asiainfo.model;
 
 
 public class KafkaLagHisEnity {
-
+  private String id;
   private String groupId;
   private String topic;
   private String partition;
@@ -11,6 +11,14 @@ public class KafkaLagHisEnity {
   private String lag;
   private String operationTime;
 
+
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
 
   public String getGroupId() {
     return groupId;

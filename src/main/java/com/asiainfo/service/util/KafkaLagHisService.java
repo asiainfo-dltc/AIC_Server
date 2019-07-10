@@ -18,8 +18,12 @@ import java.util.concurrent.ExecutionException;
  */
 public interface KafkaLagHisService {
     public void insertLagHis(KafkaLagHisEnity kafkaLagHisEnity);
-    public List<KafkaLagHisEnity> getLagHis(int pageSize, int start);
+    public List<KafkaLagHisEnity> getLagHis(String start, String end);
+    public List<String> getTopicsHis();
     public JSONArray getLag(JSONArray groupIds) throws ExecutionException, InterruptedException;
+/*
+    public JSONArray getLogEndOffset() throws ExecutionException, InterruptedException;
+*/
     public  void seekOffset(KafkaLagHisEnity kafkaLagHisEnity);
 
 }

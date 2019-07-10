@@ -42,8 +42,16 @@ public class KafkaLagHisServiceImpl implements KafkaLagHisService{
     }
 
     @Override
-    public List<KafkaLagHisEnity> getLagHis(int pageSize, int start) {
-        return kafkaLagHisDao.getKafkaLagHis(pageSize,start);
+    public List<KafkaLagHisEnity> getLagHis(String start, String end) {
+        start="2019-07-06";
+        end ="2019-07-30";
+        List<KafkaLagHisEnity> result=kafkaLagHisDao.getKafkaLagHis(start,end);
+        return result ;
+    }
+
+    @Override
+    public List<String> getTopicsHis() {
+        return  kafkaLagHisDao.getKafkaTopicsHis();
     }
 
     @Override

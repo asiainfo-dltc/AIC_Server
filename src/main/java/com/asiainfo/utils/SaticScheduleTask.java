@@ -59,16 +59,21 @@ public class SaticScheduleTask {
 
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     //3.添加定时任务
+    //每五分钟执行一次
+    //@Scheduled(cron = "0 0 * * * ? ")
 
-   // @Scheduled(cron = "*/30 * * * * ?")
+  //  @Scheduled(cron = "*/30 * * * * ? ")
     //或直接指定时间间隔，例如：5秒
     //@Scheduled(fixedRate=5000)
- /*  @Scheduled(cron = "0 0 6,18 * * ?")
+    //每日24点执行
+  // @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 0/1 * * * ? ")
     private void configureTasks() {
         System.err.println("执行静态定时任务时间: " + LocalDateTime.now());
+
        // ReadShellLine readShellLine=new ReadShellLine();
-        readShellLine.readShellLine();
-    }*/
+      //  readShellLine.readShellLine();
+    }
     /*@Scheduled(fixedRate=1000*60)
     public void doTask(){
         try {
