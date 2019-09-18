@@ -24,13 +24,30 @@ public class HBaseService {
     // Admin can be used to create, drop, list, enable and disable and
     // otherwise modify tables,
     // as well as perform other administrative operations.
-    private Admin admin = null;
-    private Connection connection = null;
+    private Admin admin_int = null;
+    private Connection connection_int = null;
 
-    public HBaseService(Configuration conf) {
+    private Admin admin_AB = null;
+    private Connection connection_AB = null;
+
+    private Admin admin_prd = null;
+    private Connection connection_prd = null;
+
+   /* private Admin admin = null;
+    private Connection connection = null;*/
+
+    public HBaseService(Configuration conf_int,Configuration conf_AB,Configuration conf_prd) {
         try {
-            connection = ConnectionFactory.createConnection(conf);
-            admin = connection.getAdmin();
+
+            connection_int = ConnectionFactory.createConnection(conf_int);
+            admin_int = connection_int.getAdmin();
+
+            connection_AB = ConnectionFactory.createConnection(conf_AB);
+            admin_AB = connection_AB.getAdmin();
+
+            connection_prd = ConnectionFactory.createConnection(conf_prd);
+            admin_prd = connection_prd.getAdmin();
+
         } catch (IOException e) {
             log.error("获取HBase连接失败");
         }
@@ -73,10 +90,43 @@ public class HBaseService {
      * 查询库中所有表的表名
      * shell command: list
      */
-    public List<String> getAllTableNames() {
+  /*  public void  init(String env){
+
+        if(env=="int")
+        {
+            admin=admin_int;
+            connection=connection_int;
+        }else if(env=="AB"){
+            admin=null;
+            admin=admin_AB;
+            connection=connection_AB;
+        }else
+        {
+            admin=admin_prd;
+            connection=connection_prd;
+        }
+
+    }*/
+    public List<String> getAllTableNames(String env ) {
         List<String> result = new ArrayList<>();
+        Admin admin = null;
+
+        TableName[] tableNames =null;
         try {
-            TableName[] tableNames = admin.listTableNames();
+            if(env=="int")
+            {
+
+                tableNames = admin_int.listTableNames();
+
+            }else if(env=="AB"){
+                tableNames = admin_AB.listTableNames();
+
+            }else
+            {
+                tableNames = admin_prd.listTableNames();
+            }
+
+
             for (TableName tableName : tableNames) {
                 result.add(tableName.getNameAsString());
             }
@@ -92,16 +142,16 @@ public class HBaseService {
      * 遍历查询指定表中的所有数据
      * shell command: scan 'user'
      */
-    public Map<String, Map<String, String>> getResultScanner(String tableName) {
+    public Map<String, Map<String, String>> getResultScanner(String tableName,String env) {
         Scan scan = new Scan();
-        return this.queryData(tableName, scan);
+        return this.queryData(tableName, scan,env);
     }
 
     /**
      * 通过表名以及过滤条件查询数据
      */
     private Map<String, Map<String, String>> queryData(String tableName,
-                                                       Scan scan) {
+                                                       Scan scan,String env) {
         // <rowKey,对应的行数据>
         Map<String, Map<String, String>> result = new HashMap<>();
 
@@ -109,7 +159,7 @@ public class HBaseService {
         // 获取表
         Table table = null;
         try {
-            table = getTable(tableName);
+            table = getTable(tableName,env);
             rs = table.getScanner(scan);
             for (Result r : rs) {
                 // 每一行数据
@@ -149,7 +199,7 @@ public class HBaseService {
     /**
      * 根据tableName和rowKey精确查询行数据
      */
-    public List<Map<String,String>> getRowData(String tableName, String rowKey) {
+    public List<Map<String,String>> getRowData(String tableName, String rowKey,String env) {
         // 返回的键值对
         Map<String, String> map = new HashMap<>();
         List<Map<String,String>> result=new ArrayList<>();
@@ -157,7 +207,7 @@ public class HBaseService {
         // 获取表
         Table table = null;
         try {
-            table = getTable(tableName);
+            table = getTable(tableName,env);
             Result hTableResult = table.get(get);
             if (hTableResult != null && !hTableResult.isEmpty()) {
                 for (Cell cell : hTableResult.listCells()) {
@@ -192,11 +242,11 @@ public class HBaseService {
      * 为表添加 or 更新数据
      */
     public void putData(String tableName, String rowKey, String familyName,
-                        String[] columns, String[] values) {
+                        String[] columns, String[] values,String env) {
         // 获取表
         Table table = null;
         try {
-            table = getTable(tableName);
+            table = getTable(tableName,env);
 
             putData(table, rowKey, tableName, familyName, columns, values);
         } catch (Exception e) {
@@ -244,8 +294,21 @@ public class HBaseService {
      * Used to communicate with a single HBase table.
      * Table can be used to get, put, delete or scan data from a table.
      */
-    private Table getTable(String tableName) throws IOException {
-        return connection.getTable(TableName.valueOf(tableName));
+    private Table getTable(String tableName,String env) throws IOException {
+
+
+        if(env=="int")
+        {
+            return connection_int.getTable(TableName.valueOf(tableName));
+
+        }else if(env=="AB"){
+
+            return connection_AB.getTable(TableName.valueOf(tableName));
+        }else
+        {
+            return connection_prd.getTable(TableName.valueOf(tableName));
+        }
+       // return connection.getTable(TableName.valueOf(tableName));
     }
 
     /**

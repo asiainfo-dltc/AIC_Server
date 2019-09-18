@@ -24,10 +24,14 @@ public class HbaseUtilController {
 
     @GetMapping("/getRelationData")
     public List<Map<String,String>> getRelationData(String tableName,String rowKey) {
+        String env="int" ;
+       // hbaseService.init(env);
+        System.out.println("tables联调"+hbaseService.getAllTableNames("int"));
 
-        System.out.println("rowKey"+rowKey);
-        System.out.println("tables"+hbaseService.getAllTableNames());
-        List<Map<String,String>> result=hbaseService.getRowData(tableName,rowKey);
+      //  hbaseService.init("AB");
+        System.out.println("tables灰度"+hbaseService.getAllTableNames("AB"));
+        System.out.println("tables生产"+hbaseService.getAllTableNames("prd"));
+        List<Map<String,String>> result=hbaseService.getRowData(tableName,rowKey,"int");
        // System.out.println("tables"+hbaseService.getRowData("ORDER_RELATION_TABLE",rowKey));
         return result;
     }

@@ -24,19 +24,46 @@ import java.io.IOException;
 @Configuration
 public class HBaseConfig {
     private Logger log = LoggerFactory.getLogger(HBaseConfig.class);
-    @Value("${spring.hbase.ZOOKEEPER_QUORUM}")
-    private String ZOOKEEPER_QUORUM;
+    /*
+    * 联调
+    * */
+    @Value("${spring.hbase-int.ZOOKEEPER_QUORUM}")
+    private String ZOOKEEPER_QUORUM_INT;
+    @Value("${spring.hbase-int.ZOOKEEPER_ZNODE_PARENT}")
+    private String ZK_ZNODE_PARENT_INT;
 
-    @Value("${spring.hbase.ZOOKEEPER_ZNODE_PARENT}")
-    private String ZK_ZNODE_PARENT;
+    /*灰度
+    * */
+    @Value("${spring.hbase-AB.ZOOKEEPER_QUORUM}")
+    private String ZOOKEEPER_QUORUM_AB;
+    @Value("${spring.hbase-AB.ZOOKEEPER_ZNODE_PARENT}")
+    private String ZK_ZNODE_PARENT_AB;
 
+    /*生产*/
+    @Value("${spring.hbase-prd.ZOOKEEPER_QUORUM}")
+    private String ZOOKEEPER_QUORUM_PRD;
+    @Value("${spring.hbase-prd.ZOOKEEPER_ZNODE_PARENT}")
+    private String ZK_ZNODE_PARENT_PRD;
     @Bean
     public HBaseService getHbaseService(){
         System.setProperty("HADOOP_USER_NAME","ocdp");
-        org.apache.hadoop.conf.Configuration conf = HBaseConfiguration.create();
-        conf.set("hbase.zookeeper.quorum",ZOOKEEPER_QUORUM );
-        conf.set(HConstants.ZOOKEEPER_ZNODE_PARENT, ZK_ZNODE_PARENT);
-        return new HBaseService(conf);
+        /*联调*/
+        org.apache.hadoop.conf.Configuration conf_int = HBaseConfiguration.create();
+        conf_int.set("hbase.zookeeper.quorum",ZOOKEEPER_QUORUM_INT );
+        conf_int.set(HConstants.ZOOKEEPER_ZNODE_PARENT, ZK_ZNODE_PARENT_INT);
+        /*灰度
+         * */
+        org.apache.hadoop.conf.Configuration conf_AB = HBaseConfiguration.create();
+        conf_AB.set("hbase.zookeeper.quorum",ZOOKEEPER_QUORUM_AB );
+        conf_AB.set(HConstants.ZOOKEEPER_ZNODE_PARENT, ZK_ZNODE_PARENT_AB);
+        /*生产*/
+        org.apache.hadoop.conf.Configuration conf_prd = HBaseConfiguration.create();
+        conf_prd.set("hbase.zookeeper.quorum",ZOOKEEPER_QUORUM_PRD );
+        conf_prd.set(HConstants.ZOOKEEPER_ZNODE_PARENT, ZK_ZNODE_PARENT_PRD);
+
+
+
+        return new HBaseService(conf_int,conf_AB,conf_prd);
     }
 
     /*@Bean
