@@ -11,8 +11,11 @@ import com.asiainfo.utils.TaskCallable;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
+import org.apache.kafka.clients.consumer.OffsetCommitCallback;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.DefaultResourceLoader;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
@@ -23,6 +26,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * @author: create by hexin
@@ -64,6 +69,7 @@ public class KafkaLagHisServiceImpl implements KafkaLagHisService{
 
        for(int i=0;i<groupIds.size();i++){
             String group = groupIds.get(i).toString();  // 遍历 jsonarray 数组，把每一个对象转成 json 对象
+            System.out.println("消费组"+group);
             loadResults.add(exec.submit(new TaskCallable(group)));
         }
 
@@ -73,10 +79,13 @@ public class KafkaLagHisServiceImpl implements KafkaLagHisService{
             while (it.hasNext()) {
                 Future<List<KafkaLagHisEnity>> next = it.next();
                 JSONObject obj =new JSONObject();
-                obj.put("groupId",next.get().get(0).getGroupId());
-                obj.put("topic",next.get().get(0).getTopic() );
-                obj.put("detail",next.get());
-                result.add(obj);
+                if(next.get().size()>0) {
+                    obj.put("groupId", next.get().get(0).getGroupId());
+                    obj.put("topic", next.get().get(0).getTopic());
+                    obj.put("detail", next.get());
+                    result.add(obj);
+                }
+
             }
         }
         /*模拟数据*/
@@ -107,22 +116,16 @@ public class KafkaLagHisServiceImpl implements KafkaLagHisService{
     public void seekOffset(KafkaLagHisEnity kafkaLagHisEnity) {
 
 
-        File path = null;
-        String rootPath = "";
+        String path = null;
         System.out.println(kafkaLagHisEnity.getCurrentOffset());
-        try {
-            path = new File(ResourceUtils.getURL("classpath:").getPath());
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        rootPath = path.getAbsolutePath();
-        //System.out.println("rootPath"+rootPath);
-
+       // path = KafkaLagHisServiceImpl.class.getClassLoader().getResource("client-ssl").getPath();
+        path="client-ssl";
         Long offset =Long.parseLong(kafkaLagHisEnity.getCurrentOffset());
+        ResourceLoader resourceLoader = new DefaultResourceLoader();
+  //      unJar();
 
-        String client_ssl_dir = rootPath+"\\client-ssl\\";
         Properties props = new Properties();
-       // props.put("bootstrap.servers", "dn49.hadoop.unicom:6667,dn50.hadoop.unicom:6667,dn51.hadoop.unicom:6667,dn54.hadoop.unicom:6667,dn55.hadoop.unicom:6667,dn56.hadoop.unicom:6667");
+        // props.put("bootstrap.servers", "dn49.hadoop.unicom:6667,dn50.hadoop.unicom:6667,dn51.hadoop.unicom:6667,dn54.hadoop.unicom:6667,dn55.hadoop.unicom:6667,dn56.hadoop.unicom:6667");
         props.put("bootstrap.servers", "ZRR-PRODUCT-109:9062,ZRR-PRODUCT-110:9062,ZRR-PRODUCT-111:9062,ZRR-PRODUCT-112:9062,ZRR-PRODUCT-113:9062,ZRR-PRODUCT-114:9062,ZRR-PRODUCT-115:9062,ZRR-PRODUCT-116:9062,ZRR-PRODUCT-117:9062");
         //props.put("bootstrap.servers", "10.5.8.35:9092,10.5.8.36:9092,10.5.8.37:9092");
         props.put("group.id", kafkaLagHisEnity.getGroupId());
@@ -138,25 +141,32 @@ public class KafkaLagHisServiceImpl implements KafkaLagHisService{
         props.put("max.poll.records",1);
         props.put("ssl.key.password", "zrr@kafkacenter");
         props.put("ssl.keystore.password", "zrr@kafkacenter");
-        props.put("ssl.truststore.location", client_ssl_dir+"kafkacenter_client.truststore.jks");
-        props.put("ssl.keystore.location", client_ssl_dir+"kafkacenter_client.keystore.jks");
-        props.put("ssl.key.location", client_ssl_dir+"kafkacenter_client.key");
-        props.put("ssl.certificate.location", client_ssl_dir+"kafkacenter_client.pem");
-        props.put("ssl.ca.location", client_ssl_dir+"ca-cert");
+/*        props.put("ssl.truststore.location",truststore);
+        props.put("ssl.keystore.location", keystore);
+        props.put("ssl.key.location",key);
+        props.put("ssl.certificate.location",certificate);
+        props.put("ssl.ca.location", ca);*/
+
+        props.put("ssl.truststore.location", path+"/kafkacenter_client.truststore.jks");
+        props.put("ssl.keystore.location", path+"/kafkacenter_client.keystore.jks");
+        props.put("ssl.key.location", path+"/kafkacenter_client.key");
+        props.put("ssl.certificate.location", path+"/kafkacenter_client.pem");
+        props.put("ssl.ca.location", path+"/ca-cert");
         props.put("sasl.mechanism", "PLAIN");
         props.put("security.protocol", "SASL_SSL");
         props.put("ssl.keystore.type", "JKS");
-        System.setProperty("java.security.auth.login.config", client_ssl_dir+"kafka_cilent_jaas.conf");
+        props.put("sasl.jaas.config", "org.apache.kafka.common.security.plain.PlainLoginModule required username=\"new_sale\" password=\"ns@hrb\";");
+        System.setProperty("java.security.auth.login.config", path+"/kafka_cilent_jaas.conf");
 
         KafkaConsumer consumer = new KafkaConsumer(props);
-      //  TopicPartition partition0 = new TopicPartition(topic, partition);
-       // consumer.assign(Arrays.asList(partition0));
+        //  TopicPartition partition0 = new TopicPartition(topic, partition);
+        // consumer.assign(Arrays.asList(partition0));
 
         TopicPartition partition0 = new TopicPartition(kafkaLagHisEnity.getTopic(), Integer.parseInt(kafkaLagHisEnity.getPartition()));
 
         consumer.assign(Arrays.asList(partition0));
         consumer.seek(partition0,offset);
-
+        consumer.commitSync();
        /* while (true) {
             ConsumerRecords<String, String> records = consumer.poll(1000);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -176,8 +186,7 @@ public class KafkaLagHisServiceImpl implements KafkaLagHisService{
 
         }*/
         // 指定kafka topic的offset消费
-       // consumer.seek(partition0,Integer.parseInt(kafkaLagHisEnity.getCurrentOffset()));
-        consumer.commitSync();
+        // consumer.seek(partition0,Integer.parseInt(kafkaLagHisEnity.getCurrentOffset()));
 
     }
 
@@ -207,6 +216,45 @@ public class KafkaLagHisServiceImpl implements KafkaLagHisService{
         }
         return true;
     }
+    private static void unJar() {
+        if (!new File("client-ssl").exists()) {
+            try {
+                String path = KafkaLagHisServiceImpl.class.getProtectionDomain().getCodeSource().getLocation().getFile();
+                ZipInputStream Zin = new ZipInputStream(new FileInputStream(path));
+                BufferedInputStream Bin = new BufferedInputStream(Zin);
 
+                File fout = null;
+                ZipEntry entry;
+                try {
+                    while ((entry = Zin.getNextEntry()) != null) {
+                        if (!entry.getName().startsWith("client-ssl")) {
+                            continue;
+                        }
+                        fout = new File(entry.getName());
+
+                        if (entry.isDirectory()) {
+                            fout.mkdirs();
+                            continue;
+                        }
+                        FileOutputStream out = new FileOutputStream(fout);
+                        BufferedOutputStream Bout = new BufferedOutputStream(out);
+                        int b;
+                        while ((b = Bin.read()) != -1) {
+                            Bout.write(b);
+                        }
+                        Bout.close();
+                        out.close();
+                        System.out.println(fout + "SSL配置文件释放成功");
+                    }
+                    Bin.close();
+                    Zin.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
 }

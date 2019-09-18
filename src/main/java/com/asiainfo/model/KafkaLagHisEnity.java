@@ -10,7 +10,7 @@ public class KafkaLagHisEnity {
   private String logEndOffset;
   private String lag;
   private String operationTime;
-
+  private String tableName;
 
   public String getId() {
     return id;
@@ -73,6 +73,13 @@ public class KafkaLagHisEnity {
     this.lag = lag;
   }
 
+  public String getTableName() {
+    return tableName;
+  }
+
+  public void setTableName(String tableName) {
+    this.tableName = tableName;
+  }
 
   public String getOperationTime() {
     return operationTime;

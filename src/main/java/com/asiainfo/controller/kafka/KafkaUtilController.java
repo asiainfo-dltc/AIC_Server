@@ -13,10 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -47,7 +45,7 @@ public class KafkaUtilController {
         lags.add(kafkaLagHisEnity);*/
         List<KafkaLagHisEnity> result= kafkaLagHisService.getLagHis(start,end);
         List<String> topics= kafkaLagHisService.getTopicsHis();
-        List<String> logEndOffset= new ArrayList<>();
+
         String[] xAxis={"2019-07-06","2019-07-07","2019-07-08"};
         jsonObject.put("legend",topics);
         jsonObject.put("xAxis",xAxis);
@@ -57,12 +55,12 @@ public class KafkaUtilController {
             map.put("name",topics.get(i) );
             map.put("type","line" );
             map.put("stack","总量" );
-
+            List<String> logEndOffset= new ArrayList<>();
             for(int k=0;k<result.size();k++) {
 
-            if(topics.get(i).equals(result.get(k).getTopic())) {
+                if(topics.get(i).equals(result.get(k).getTopic())) {
                 logEndOffset.add(result.get(k).getLogEndOffset());
-                 }
+                }
              }
             map.put("data",logEndOffset);
             series.add(map);
@@ -99,6 +97,4 @@ public class KafkaUtilController {
         return result;*/
 
     }
-
-
 }

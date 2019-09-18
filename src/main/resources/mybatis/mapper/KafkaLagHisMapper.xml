@@ -9,13 +9,14 @@
         <result column="log_end_offset" property="logEndOffset" />
         <result column="lag" property="lag" />
         <result column="operation_time" property="operationTime" />
+        <result column="id" property="id" />
     </resultMap>
 
 
     <insert id="insertKafkaLagHis">
         insert into kafka_lag_his
         values
-        (#{kafkaLagHisEnity.groupId},#{kafkaLagHisEnity.topic},#{kafkaLagHisEnity.partition},#{kafkaLagHisEnity.currentOffset},#{kafkaLagHisEnity.logEndOffset},#{kafkaLagHisEnity.lag},#{kafkaLagHisEnity.operationTime})
+        (#{kafkaLagHisEnity.id},#{kafkaLagHisEnity.groupId},#{kafkaLagHisEnity.topic},#{kafkaLagHisEnity.partition},#{kafkaLagHisEnity.currentOffset},#{kafkaLagHisEnity.logEndOffset},#{kafkaLagHisEnity.lag},#{kafkaLagHisEnity.operationTime})
     </insert>
 
     <select id="getKafkaLagHis" resultMap="kafkaLagHisMap">

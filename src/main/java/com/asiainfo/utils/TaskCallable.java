@@ -1,6 +1,7 @@
 package com.asiainfo.utils;
 
 import com.asiainfo.model.KafkaLagHisEnity;
+import com.asiainfo.service.conf.RedisService;
 import com.asiainfo.utils.kafka.ReadShellLine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -26,16 +27,6 @@ public class TaskCallable implements Callable<List<KafkaLagHisEnity>> {
     @Override
     public List<KafkaLagHisEnity> call() throws Exception {
         ReadShellLine readShellLine=new ReadShellLine();
-        JedisPoolConfig jedisPoolConfig = new JedisPoolConfig();
-
-     /*   JedisPool jedisPool = new JedisPool(jedisPoolConfig, "10.245.32.69", 6379, 1000, "r-fk4979cce008efe4:PROsjgj345");
-        List<KafkaLagHisEnity> list=readShellLine.excuteCommandQuery(id);
-        Jedis jedis= jedisPool.getResource();
-        jedis.set(id,list.toString());*/
-
-
-        //return "result of taskWithResult "+id;
-        System.out.println("id"+id);
         /*List<KafkaLagHisEnity> detail=new ArrayList<KafkaLagHisEnity>();
         KafkaLagHisEnity entity =new KafkaLagHisEnity();
         KafkaLagHisEnity entity1 =new KafkaLagHisEnity();
@@ -52,7 +43,5 @@ public class TaskCallable implements Callable<List<KafkaLagHisEnity>> {
 
        // conn.stringCommands().set(serializationStrategy.serialize(id), serializationStrategy.serialize(readShellLine.excuteCommandQuery(id)));
        return readShellLine.excuteCommandQuery(id);
-     //   String aa=serializationStrategy.deserialize(conn.get(serializationStrategy.serialize(id)));
-       // return detail;
     }
 }

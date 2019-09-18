@@ -15,7 +15,7 @@ public class RedisServiceImpl implements RedisService {
 
     public redis.clients.jedis.Jedis getResource() {
         //获取Jedis连接池资源
-        System.out.println("aaa"+jedisPool.getResource().getDB().toString());
+    //    System.out.println("aaa"+jedisPool.getResource().getDB().toString());
         return jedisPool.getResource();
     }
 

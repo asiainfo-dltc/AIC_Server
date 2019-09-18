@@ -1,15 +1,13 @@
 package com.asiainfo.utils.kafka;
 
 import com.asiainfo.model.KafkaLagHisEnity;
-import com.asiainfo.service.impl.util.KafkaLagHisServiceImpl;
+import com.asiainfo.service.conf.RedisService;
 import com.asiainfo.service.util.KafkaLagHisService;
-import org.codehaus.jackson.map.util.JSONPObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RestController;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,10 +25,23 @@ import java.util.StringTokenizer;
  * @description: com.asiainfo.utils.kafka
  * @date:2019/4/1
  */
-@Service("readShellLine")
+@Component
 public class ReadShellLine {
-    @Autowired
+
     private KafkaLagHisService kafkaLagHisService;
+
+
+    @Autowired
+    private RedisService redisService;
+
+    public static ReadShellLine readShellLine;
+
+    @PostConstruct
+    public void init() {
+        readShellLine = this;
+    }
+
+
     public  void readShellLine() {
         String[] groups=new String[]{
                 "T0000_CB.DOMAIN1.ROUTER.ACCESS_0630_221",
@@ -64,10 +75,10 @@ public class ReadShellLine {
         List<KafkaLagHisEnity> processList = new ArrayList<KafkaLagHisEnity>();
         try {
             //String groupid = "T0000_CB.DOMAIN1.ROUTER.ACCESS_0630_221";
-           // String commandStr = "export KAFKA_OPTS=\" -Djava.security.auth.login.config=/home/dacp/monitor/zrr-kafka/client-ssl/kafka_cilent_jaas.conf\"\n" + "/home/dacp/monitor/zrr-kafka/kafka_2.12-1.1.0/bin/kafka-consumer-groups.sh --new-consumer --bootstrap-server 10.191.17.109:9062,10.191.17.110:9062 --command-config /home/dacp/monitor/zrr-kafka/client-ssl/client.properties --describe --group " + groupid + " | sort -n -k 2";
+            String commandStr = "export KAFKA_OPTS=\" -Djava.security.auth.login.config=/home/dacp/monitor/zrr-kafka/client-ssl/kafka_cilent_jaas.conf\"\n" + "/home/dacp/monitor/zrr-kafka/kafka_2.12-1.1.0/bin/kafka-consumer-groups.sh --new-consumer --bootstrap-server 10.191.17.109:9062,10.191.17.110:9062 --command-config /home/dacp/monitor/zrr-kafka/client-ssl/client.properties --describe --group " + groupid;
 
-            String commandStr = "export KAFKA_OPTS=\" -Djava.security.auth.login.config=/home/admin/client-ssl/kafka_cilent_jaas.conf\"\n" + "/home/admin/kafka_2.12-1.1.0/bin/kafka-consumer-groups.sh --new-consumer --bootstrap-server 10.191.17.109:9062,10.191.17.110:9062 --command-config /home/admin/client-ssl/client.properties --describe --group " + groupid + " | sort -n -k 2";
-            System.out.println("消费组：" + groupid);
+          //  String commandStr = "export KAFKA_OPTS=\" -Djava.security.auth.login.config=/home/admin/client-ssl/kafka_cilent_jaas.conf\"\n" + "/home/admin/kafka_2.12-1.1.0/bin/kafka-consumer-groups.sh --new-consumer --bootstrap-server 10.191.17.109:9062,10.191.17.110:9062 --command-config /home/admin/client-ssl/client.properties --describe --group " + groupid + " | sort -n -k 2";
+            System.err.println("消费组：" + groupid);
             String[] cmd = new String[]{"/bin/sh", "-c", commandStr};
            process = Runtime.getRuntime().exec(cmd);
 
@@ -107,13 +118,13 @@ public class ReadShellLine {
         enity.setCurrentOffset(arr[2]);
         enity.setLogEndOffset(arr[3]);
         enity.setLag(arr[4]);
+
         SimpleDateFormat sdf =new SimpleDateFormat("yyyy-MM-dd HH:00:00" );
         Date d= new Date();
         String str = sdf.format(d);
         enity.setOperationTime(str);
-       // System.out.println("insert start "+line);
-        kafkaLagHisService.insertLagHis(enity);
-       // System.out.println("insert end ");
+        enity.setId(arr[0]+"|"+arr[1]+"|"+group+"|"+str);
+        readShellLine.kafkaLagHisService.insertLagHis(enity);
     }
 
     public List<KafkaLagHisEnity> excuteCommandQuery(String groupid){
@@ -165,8 +176,13 @@ public class ReadShellLine {
         enity.setPartition(arr[1]);
         enity.setCurrentOffset(arr[2]);
         enity.setLogEndOffset(arr[3]);
+        String tableName=readShellLine.redisService.get(arr[0]).get(arr[1]);
+        enity.setTableName(tableName);
+        System.out.println("redis获取分区表名"+tableName);
         enity.setLag(arr[4]);
-        SimpleDateFormat sdf =new SimpleDateFormat("yyyy-MM-dd HH:00:00" );
+        //redisService.get("");
+
+        SimpleDateFormat sdf =new SimpleDateFormat("yyyy-MM-dd HH:mm:ss" );
         Date d= new Date();
         String str = sdf.format(d);
         enity.setOperationTime(str);
