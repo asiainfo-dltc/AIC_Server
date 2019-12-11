@@ -50,8 +50,8 @@ public class RedisConfig extends CachingConfigurerSupport {
 
         JedisPool jedisPool = new JedisPool(jedisPoolConfig, host, port, 0, password);
 
-        log.debug("JedisPool注入成功！");
-        log.debug("redis地址：" + host + ":"+port+"pwd"+password );
+        log.info("JedisPool注入成功！");
+        log.info("redis地址：" + host + ":"+port+"pwd"+password );
         return  jedisPool;
     }
 }
