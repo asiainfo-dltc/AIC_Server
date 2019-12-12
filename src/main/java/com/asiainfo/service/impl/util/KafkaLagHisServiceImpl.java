@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.dao.KafkaLagHisDao;
 import com.asiainfo.model.KafkaLagHisEnity;
 /*import com.asiainfo.service.conf.RedisService;*/
+import com.asiainfo.model.kafka.KafkaConfigEntity;
 import com.asiainfo.service.conf.RedisService;
 import com.asiainfo.service.util.KafkaLagHisService;
 import com.asiainfo.utils.TaskCallable;
@@ -188,6 +189,14 @@ public class KafkaLagHisServiceImpl implements KafkaLagHisService{
         // 指定kafka topic的offset消费
         // consumer.seek(partition0,Integer.parseInt(kafkaLagHisEnity.getCurrentOffset()));
 
+    }
+    /*
+    * 查询流程对于的消费者及主题
+    * */
+    @Override
+    public List<KafkaConfigEntity> getTopicAndGroup(KafkaConfigEntity kafkaConfigEntity) {
+        List<KafkaConfigEntity> result=kafkaLagHisDao.getTopicAndGroup(kafkaConfigEntity);
+        return result;
     }
 
     public boolean  getLoadPercent(ArrayList<Future<List<KafkaLagHisEnity>>>  loadResults ) {

@@ -141,6 +141,7 @@
 					<groupId>org.elasticsearch.plugin</groupId>
 					<artifactId>transport-netty4-client</artifactId>
 				</exclusion>
+
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -149,6 +150,13 @@
 			<version>5.6.16</version>
 		</dependency>
 
+      <!--spring boot 热部署工具 和想象不符，没卵用-->
+	<!--	<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<scope>runtime</scope>
+			<optional>true</optional>
+		</dependency>-->
 
 		<!--引入eureka-->
 		<!--<dependency>
@@ -208,7 +216,13 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+		<!--		<configuration>
+					<executable>true</executable>
+					<fork>true</fork>
+				</configuration>-->
 			</plugin>
+
+
 		<!--	<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration>

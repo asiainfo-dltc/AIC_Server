@@ -4,6 +4,7 @@ package com.asiainfo.service.util;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.asiainfo.model.KafkaLagHisEnity;
+import com.asiainfo.model.kafka.KafkaConfigEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -21,9 +22,7 @@ public interface KafkaLagHisService {
     public List<KafkaLagHisEnity> getLagHis(String start, String end);
     public List<String> getTopicsHis();
     public JSONArray getLag(JSONArray groupIds) throws ExecutionException, InterruptedException;
-/*
-    public JSONArray getLogEndOffset() throws ExecutionException, InterruptedException;
-*/
     public  void seekOffset(KafkaLagHisEnity kafkaLagHisEnity);
+    public  List<KafkaConfigEntity> getTopicAndGroup(KafkaConfigEntity kafkaConfigEntity);
 
 }

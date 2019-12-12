@@ -9,7 +9,7 @@ public class test {
 * */
     public static void main(String[] args){
 
-        System.out.println("{bcrypt}"+new BCryptPasswordEncoder().encode("1qaz!QAZ"));
+        System.out.println("{bcrypt}"+new BCryptPasswordEncoder().encode("admin"));
 
 
 

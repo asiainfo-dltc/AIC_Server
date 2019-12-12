@@ -1,12 +1,8 @@
 package com.asiainfo.utils.kafka;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.Map.Entry;
+
+import com.asiainfo.model.kafka.KafkaConfigEntity;
 import kafka.api.PartitionOffsetRequestInfo;
 import kafka.common.ErrorMapping;
 import kafka.common.OffsetMetadataAndError;
@@ -15,22 +11,41 @@ import kafka.javaapi.*;
 import kafka.javaapi.consumer.SimpleConsumer;
 import kafka.network.BlockingChannel;
 import org.apache.kafka.common.protocol.Errors;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
 
+@Service
 public class KafkaOffsetTools {
 
-    public static void main(String[] args) {
 
-        String topic = "joinMergeQueueOrder_ningxia";
+/*    public List<KafkaConfigEntity> getLags(List<KafkaConfigEntity> result){
+
+
+        Iterator iterator = result.iterator();
+        while(iterator.hasNext()){
+
+            getLag((KafkaConfigEntity)iterator.next());
+        }
+        return result;
+    }*/
+    @Async("taskExecutor")
+    public  KafkaConfigEntity getLag( KafkaConfigEntity kafkaConfigEntity) {
+
+
+        String topic =kafkaConfigEntity.getTopic();
+        String group =kafkaConfigEntity.getGroupId();
+
+
+      //  String topic = "joinMergeQueueOrder_ningxia";
         String broker = "10.191.46.50";
         int port = 6667;
-        String group = "T0000_nxbss_streams_collect";
+       // String group = "T0000_nxbss_streams_collect";
         String clientId = "Client_app-log-all-beta_2";
         int correlationId = 0;
         BlockingChannel channel = new BlockingChannel(broker, port,
                 BlockingChannel.UseDefaultBufferSize(),
                 BlockingChannel.UseDefaultBufferSize(),
                 5000);
-        System.out.println(" BlockingChannel.UseDefaultBufferSize()"+ BlockingChannel.UseDefaultBufferSize());
         channel.connect();
 
         List<String> seeds = new ArrayList<String>();
@@ -57,9 +72,6 @@ public class KafkaOffsetTools {
             int partition = entry.getKey();
             try {
                 channel.send(fetchRequest.underlying());
-
-             //   System.out.println("@@@@"+channel.receive().payload().remaining());
-
                 OffsetFetchResponse fetchResponse = OffsetFetchResponse.readFrom(channel.receive().payload());
 
                 TopicAndPartition testPartition0 = new TopicAndPartition(topic, partition);
@@ -88,11 +100,25 @@ public class KafkaOffsetTools {
         System.out.println("logSize："+sum);
         System.out.println("offset："+sumOffset);
 
-        lag = sum - sumOffset;
+
         System.out.println("lag:"+ lag);
 
 
+        if(sumOffset<0)
+        {
+           lag=sumOffset;
+        }else
+        {
+            lag = sum - sumOffset;
+        }
+        kafkaConfigEntity.setLag(lag);
+        kafkaConfigEntity.setLogSize(sum);
+        return kafkaConfigEntity;
+
     }
+
+
+
 
     public KafkaOffsetTools() {
     }

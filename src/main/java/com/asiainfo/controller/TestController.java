@@ -24,7 +24,7 @@ public class TestController {
 		return user;
 	}
 
-	@GetMapping("/testRedis")
+	//@GetMapping("/testRedis")
 	public void testRedis() {
 
 

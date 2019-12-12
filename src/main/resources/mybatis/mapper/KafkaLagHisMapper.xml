@@ -12,6 +12,14 @@
         <result column="id" property="id" />
     </resultMap>
 
+    <resultMap id="kafkaConfigMap" type="com.asiainfo.model.kafka.KafkaConfigEntity">
+        <result column="id" property="id" />
+        <result column="group_id" property="groupId" />
+        <result column="topic" property="topic" />
+        <result column="lable" property="lable" />
+        <result column="sys_code" property="sysCode" />
+        <result column="level" property="level" />
+    </resultMap>
 
     <insert id="insertKafkaLagHis">
         insert into kafka_lag_his
@@ -25,6 +33,9 @@
 
    <select id="getKafkaTopicsHis" resultType="java.lang.String">
         SELECT DISTINCT (topic) from kafka_lag_his;
+    </select>
+    <select id="getTopicAndGroup" resultMap="kafkaConfigMap">
+        SELECT * from kafka_config t where t.level=#{kafkaConfigEntity.level} and t.sys_code=#{kafkaConfigEntity.sysCode};
     </select>
 
 
