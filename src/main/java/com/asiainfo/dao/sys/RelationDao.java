@@ -1,4 +1,4 @@
-package com.asiainfo.dao;
+package com.asiainfo.dao.sys;
 
 import java.util.List;
 

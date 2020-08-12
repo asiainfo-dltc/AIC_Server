@@ -1,4 +1,4 @@
-package com.asiainfo.dao;
+package com.asiainfo.dao.until;
 
 import com.alibaba.fastjson.JSONArray;
 import com.asiainfo.model.KafkaLagHisEnity;
