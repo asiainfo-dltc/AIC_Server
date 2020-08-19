@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.asiainfo.dao.UserDao;
+import com.asiainfo.dao.sys.UserDao;
 import com.asiainfo.model.sys.UserEntity;
 import com.asiainfo.service.sys.UserService;
 

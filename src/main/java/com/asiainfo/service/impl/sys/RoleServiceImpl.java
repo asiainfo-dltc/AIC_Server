@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.asiainfo.dao.RoleDao;
+import com.asiainfo.dao.sys.RoleDao;
 import com.asiainfo.model.sys.RoleEntity;
 import com.asiainfo.service.sys.RoleService;
 

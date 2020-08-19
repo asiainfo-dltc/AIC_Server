@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.asiainfo.dao.RelationDao;
+import com.asiainfo.dao.sys.RelationDao;
 import com.asiainfo.model.sys.RelationEntity;
 import com.asiainfo.service.sys.RelationService;
 
