@@ -2,26 +2,20 @@ package com.asiainfo.service.impl.util;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.asiainfo.dao.KafkaLagHisDao;
+import com.asiainfo.dao.until.KafkaLagHisDao;
 import com.asiainfo.model.KafkaLagHisEnity;
 /*import com.asiainfo.service.conf.RedisService;*/
 import com.asiainfo.model.kafka.KafkaConfigEntity;
-import com.asiainfo.service.conf.RedisService;
 import com.asiainfo.service.util.KafkaLagHisService;
 import com.asiainfo.utils.TaskCallable;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
-import org.apache.kafka.clients.consumer.OffsetCommitCallback;
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
 
 import java.io.*;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
